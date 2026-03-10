@@ -1,7 +1,17 @@
 /* =============================================
    AMTEC – Plantillas de Gestión  |  app.js
    ============================================= */
+// ─── ENDPOINT POWER AUTOMATE ─────────────────────────────────────────────────
+const FLOW_URL = "https://defaulte3a3dc06428e460e890bcf9c7c3ec8.c9.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/66382b019b16451e8de2b727c539febf/triggers/manual/paths/invoke?api-version=1";
 
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = () => reject("Error al leer el archivo");
+    reader.readAsDataURL(file);
+  });
+}
 // ─── DATOS DE FORMULARIOS ────────────────────────────────────────────────────
 const FORMS = {
   // ── MESA DE AYUDA ──────────────────────────────────────────────────────────
@@ -448,35 +458,101 @@ function buildFileField(field) {
 
 // ─── SUBMIT ───────────────────────────────────────────────────────────────────
 
-function handleSubmit(e) {
+async function handleSubmit(e) {
   e.preventDefault();
 
   const cat  = FORMS[currentCategory];
   const form = cat.forms[currentFormKey];
 
-  // Generar texto de plantilla
+  // Generar texto de plantilla (igual que antes)
   const lines = [
     ` *${cat.label.toUpperCase()} — ${form.title.toUpperCase()}*`,
     "─".repeat(34),
   ];
-
   form.fields.forEach(field => {
-    if (field.type === "file") return; // omitir archivos
+    if (field.type === "file") return;
     const el = document.getElementById("field_" + field.id);
     if (!el) return;
     const val = el.value.trim() || (field.required ? "(pendiente)" : "—");
     lines.push(`*${field.label}:* ${val}`);
   });
-
   lines.push("─".repeat(34));
 
-  const output = lines.join("\n");
   const outputText  = document.getElementById("output-text");
   const outputBlock = document.getElementById("output-block");
-
-  outputText.textContent = output;
+  outputText.textContent = lines.join("\n");
   outputBlock.classList.remove("hidden");
   outputBlock.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  // Construir payload
+  const payload = {
+    categoria:        currentCategory,
+    formulario:       currentFormKey,
+    titulo:           form.title,
+    motivo:           getVal("motivo"),
+    ticket:           getNum("ticket"),
+    cliente:          getVal("cliente"),
+    ciudad:           getVal("ciudad"),
+    zona:             getVal("zona"),
+    pon:              getVal("pon"),
+    tipo:             getVal("tipo"),
+    instalacion:      getVal("instalacion"),
+    precinto:         getNum("precinto"),
+    serial_instalado: getVal("serial_instalado"),
+    serial_retirado:  getVal("serial_retirado"),
+    nombre_red:       getVal("nombre_red"),
+    contrasena:       getVal("contrasena"),
+    nueva_contrasena: getVal("nueva_contrasena"),
+    tecnico:          getVal("tecnico"),
+    link_pagina:      getVal("link_pagina"),
+    foto_base64:      "",
+    fecha:            new Date().toISOString()
+  };
+
+  // Convertir foto si existe
+  const fileInput = document.getElementById("field_anexos");
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    try { payload.foto_base64 = await fileToBase64(fileInput.files[0]); }
+    catch (err) { console.warn("No se pudo convertir la foto:", err); }
+  }
+
+  // Enviar al Flow
+  const btn = document.querySelector(".btn-submit");
+  try {
+    btn.textContent = "Enviando...";
+    btn.disabled = true;
+    const response = await fetch(FLOW_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (response.ok) {
+      btn.textContent = "✓ Enviado";
+      btn.style.background = "#4ecdc4";
+    } else {
+      throw new Error(response.status);
+    }
+  } catch (err) {
+    console.error("Error al enviar:", err);
+    btn.textContent = "⚠ Error al enviar";
+    btn.style.background = "#ff5a5a";
+  } finally {
+    setTimeout(() => {
+      btn.textContent = "Generar Plantilla →";
+      btn.style.background = "";
+      btn.disabled = false;
+    }, 3000);
+  }
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function getVal(id) {
+  const el = document.getElementById("field_" + id);
+  return el ? el.value.trim() : "";
+}
+function getNum(id) {
+  const el = document.getElementById("field_" + id);
+  return el && el.value !== "" ? Number(el.value) : 0;
 }
 
 // ─── RESET ─────────────────────────────────────────────────────────────────
@@ -499,4 +575,5 @@ function copyOutput() {
       btn.style.color = "";
     }, 2000);
   });
+
 }
