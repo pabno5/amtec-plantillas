@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AMTEC – Plantillas de Gestión</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo-block">
+        <span class="logo-tag">◈</span>
+        <span class="logo-name">AMTEC</span>
+      </div>
+      <p class="header-sub">Sistema de Plantillas de Gestión</p>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <!-- Selector de categoría -->
+    <section class="selector-block">
+      <label class="selector-label" for="categoria">Selecciona una categoría</label>
+      <div class="select-wrapper">
+        <select id="categoria" onchange="onCategoriaChange()">
+          <option value="">— Elige una categoría —</option>
+          <option value="mesa">Mesa de Ayuda</option>
+          <option value="tecnico">Técnico AMTEC</option>
+          <option value="servicios">Servicios Técnico AMTEC</option>
+        </select>
+        <span class="select-arrow">↓</span>
+      </div>
+    </section>
+
+    <!-- Selector de formulario -->
+    <section class="selector-block hidden" id="form-selector-block">
+      <label class="selector-label" for="formulario">Selecciona el tipo de plantilla</label>
+      <div class="select-wrapper">
+        <select id="formulario" onchange="onFormularioChange()">
+          <option value="">— Elige un formulario —</option>
+        </select>
+        <span class="select-arrow">↓</span>
+      </div>
+    </section>
+
+    <!-- Contenedor del formulario dinámico -->
+    <section class="form-container hidden" id="form-container">
+      <div class="form-header">
+        <span class="form-tag" id="form-tag"></span>
+        <h2 class="form-title" id="form-title"></h2>
+      </div>
+      <form id="dynamic-form" onsubmit="handleSubmit(event)">
+        <div class="fields-grid" id="fields-grid"></div>
+        <div class="form-actions">
+          <button type="button" class="btn-reset" onclick="resetForm()">✕ Limpiar</button>
+          <button type="submit" class="btn-submit">Generar Plantilla →</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Output de la plantilla generada -->
+    <section class="output-block hidden" id="output-block">
+      <div class="output-header">
+        <span>Plantilla generada</span>
+        <button class="btn-copy" onclick="copyOutput()">Copiar</button>
+      </div>
+      <pre class="output-text" id="output-text"></pre>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>AMTEC · Sistema Interno de Plantillas</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
