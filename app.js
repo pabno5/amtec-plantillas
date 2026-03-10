@@ -2,7 +2,7 @@
    AMTEC – Plantillas de Gestión  |  app.js
    ============================================= */
 // ─── ENDPOINT POWER AUTOMATE ─────────────────────────────────────────────────
-const FLOW_URL = "https://defaulte3a3dc06428e460e890bcf9c7c3ec8.c9.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/66382b019b16451e8de2b727c539febf/triggers/manual/paths/invoke?api-version=1";
+const FLOW_URL = "https://defaulte3a3dc06428e460e890bcf9c7c3ec8.c9.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/66382b019b16451e8de2b727c539febf/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Gb2kel2UUys8N9fye-1rrKGnHmeMvkogqiFbALebgfo";
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -577,3 +577,4 @@ function copyOutput() {
   });
 
 }
+
